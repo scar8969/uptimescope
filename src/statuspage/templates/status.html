@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Status · {{ app_name }}{% endblock %}
+{% block nav %}
+  <a href="{{ url_for('index') }}" style="color:var(--text)">Status</a>
+  <a href="{{ url_for('admin') }}">Admin</a>
+  <a href="{{ url_for('monitor.status') }}">API</a>
+{% endblock %}
+{% block navright %}<span class="mono">{{ stats.monitors }} monitor(s)</span>{% endblock %}
+{% block content %}
+
+{% if stats.down == 0 and stats.incidents == 0 %}
+  <div class="card" style="text-align:center">
+    <span class="tag g">●</span>
+    <h2 style="margin-top:6px">All systems operational</h2>
+    <div class="mono">{{ stats.monitors }} monitor(s) reporting, no open incidents.</div>
+  </div>
+{% else %}
+  <div class="card" style="text-align:center;border-color:var(--red)">
+    <span class="tag r">●</span>
+    <h2 style="margin-top:6px">Degraded service</h2>
+    <div class="mono">{{ stats.down }} of {{ stats.monitors }} monitor(s) failing,
+      {{ stats.incidents }} open incident(s).</div>
+  </div>
+{% endif %}
+
+<div class="card">
+  <div class="row" style="justify-content:space-between">
+    <div class="stat"><b>{{ stats.up }}</b><span>up</span></div>
+    <div class="stat"><b>{{ stats.down }}</b><span>down</span></div>
+    <div class="stat"><b>{{ stats.incidents }}</b><span>open incidents</span></div>
+    <div class="stat"><b>{{ stats.monitors }}</b><span>monitors</span></div>
+    <span class="sp"></span>
+    <a class="btn g" href="{{ url_for('admin') }}">Manage monitors</a>
+  </div>
+</div>
+
+{% if monitors %}
+<div class="card">
+  <h2>Services</h2>
+  <table>
+    <tr><th>service</th><th>target</th><th>type</th><th>uptime 30d</th><th>last 30 checks</th><th>last result</th></tr>
+    {% for m in monitors %}
+      {% set rows = checks.get(m.id) or [] %}
+      {% set last = rows[-1] if rows else none %}
+      <tr>
+        <td>{{ m.name }}</td>
+        <td class="mono">{{ m.target }}</td>
+        <td><span class="tag">{{ m.type }}</span></td>
+        <td>{{ uptime.get(m.id) }}%</td>
+        <td>
+          <div class="chart" style="height:22px">
+            {% for c in rows %}<i style="height:{{ 10 + (90 * (c.ms or 0) / 500) if c.ms else 10 }}%;background:{{ 'var(--green)' if c.ok else 'var(--red)' }}"></i>{% endfor %}
+          </div>
+        </td>
+        <td>
+          {% if last is none %}<span class="mono">no checks yet</span>
+          {% else %}<span class="tag {{ 'g' if last.ok else 'r' }}">{{ 'ok' if last.ok else 'fail' }}</span>
+            <span class="mono">{{ last.ms }}ms</span>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+{% else %}
+<div class="card">
+  <h2>No monitors yet</h2>
+  <p class="mono">The database is empty. Create one on the <a href="{{ url_for('admin') }}">admin page</a>
+  or with <span class="mono">POST /api/admin/monitors</span>; the scheduler will fill this table in.</p>
+</div>
+{% endif %}
+
+<div class="card">
+  <h4>Incidents</h4>
+  {% if incidents %}
+    <table>
+      <tr><th>monitor</th><th>severity</th><th>started</th><th>state</th></tr>
+      {% for i in incidents %}
+      <tr>
+        <td>{{ monitor_names.get(i.monitor_id, 'monitor ' ~ i.monitor_id) }}</td>
+        <td><span class="tag r">{{ i.severity }}</span></td>
+        <td class="mono">{{ i.started_at }}</td>
+        <td>
+          {% if i.resolved_at %}<span class="tag g">resolved</span>
+          {% else %}<span class="tag y">open</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <div class="mono" style="color:var(--muted)">No incidents recorded.</div>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Admin · {{ app_name }}{% endblock %}
+{% block nav %}
+  <a href="{{ url_for('index') }}">Status</a>
+  <a href="{{ url_for('admin') }}" style="color:var(--text)">Admin</a>
+  <a href="{{ url_for('monitor.status') }}">API</a>
+{% endblock %}
+{% block navright %}<span class="mono">{{ open_incident_count }} open incident(s)</span>{% endblock %}
+{% block content %}
+
+<div class="card">
+  <h2>Add monitor</h2>
+  <form method="post" action="{{ url_for('monitor.add_monitor') }}">
+    <div class="row" style="margin-bottom:8px">
+      <label for="name">name</label>
+      <input id="name" name="name" placeholder="api" required>
+      <label for="type">type</label>
+      <select id="type" name="type">
+        <option value="http">http</option>
+        <option value="tcp">tcp</option>
+        <option value="ssl">ssl</option>
+      </select>
+      <label for="target">target</label>
+      <input id="target" name="target" size="34" placeholder="https://example.com  ·  host:port  ·  hostname" required>
+      <label for="interval">interval</label>
+      <input id="interval" name="interval" type="number" min="5" value="60" style="width:80px">
+      <button class="btn" type="submit">Add monitor</button>
+    </div>
+    <div class="mono">target is a URL for <b>http</b>, <b>host:port</b> for <b>tcp</b>, and a bare
+      hostname for <b>ssl</b>. The scheduler skips a monitor until its interval has elapsed.</div>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Monitors</h2>
+  {% if monitors %}
+  <table>
+    <tr><th>name</th><th>type</th><th>target</th><th>interval</th><th>retries</th><th>checks</th><th>active</th><th>uptime 30d</th><th>checks</th></tr>
+    {% for m in monitors %}
+    <tr>
+      <td>{{ m.name }}</td>
+      <td><span class="tag">{{ m.type }}</span></td>
+      <td class="mono">{{ m.target }}</td>
+      <td class="mono">{{ m.interval }}s</td>
+      <td class="mono">{{ m.retries }}</td>
+      <td class="mono">{{ check_counts.get(m.id, 0) }}</td>
+      <td>{% if m.active %}<span class="tag g">yes</span>{% else %}<span class="tag y">no</span>{% endif %}</td>
+      <td class="mono">{{ m.created_at }}</td>
+      <td><a class="btn g" href="{{ url_for('monitor.checks', mid=m.id) }}">json</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="mono" style="color:var(--muted)">No monitors yet — use the form above.</div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Incidents</h2>
+  {% if incidents %}
+  <table>
+    <tr><th>#</th><th>monitor</th><th>severity</th><th>started</th><th>message</th><th>state</th><th></th></tr>
+    {% for i in incidents %}
+    <tr>
+      <td class="mono">{{ i.id }}</td>
+      <td>{{ monitor_names.get(i.monitor_id, 'monitor ' ~ i.monitor_id) }}</td>
+      <td><span class="tag r">{{ i.severity }}</span></td>
+      <td class="mono">{{ i.started_at }}</td>
+      <td class="mono">{{ i.message }}</td>
+      <td>{% if i.resolved_at %}<span class="tag g">resolved {{ i.resolved_at }}</span>
+          {% else %}<span class="tag y">open</span>{% endif %}</td>
+      <td>
+        {% if not i.resolved_at %}
+        <form method="post" action="{{ url_for('monitor.resolve', iid=i.id) }}">
+          <button class="btn grn" type="submit">Resolve</button>
+        </form>
+        {% else %}<span class="mono">—</span>{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="mono" style="color:var(--muted)">No incidents recorded.</div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h4>JSON API</h4>
+  <div class="code">GET  {{ url_for('monitor.status') }}
+POST {{ url_for('monitor.add_monitor') }}                 {"name","type","target","interval","retries"}
+GET  {{ url_for('monitor.checks', mid=1) }}
+POST {{ url_for('monitor.resolve', iid=1) }}</div>
+  <div class="mono" style="margin-top:8px">Both write endpoints accept a JSON body and this page's
+    HTML form; a form post is redirected back here, a JSON post gets JSON back.</div>
+</div>
+
+{% endblock %}

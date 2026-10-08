@@ -1,0 +1,71 @@
+openapi: 3.0.0
+info:
+  title: "statuspage"
+  version: 0.1.0
+  description: >
+    Uptime monitor and public status page. The two write endpoints are
+    unauthenticated in this scaffold and accept either an application/json body
+    (JSON response) or an application/x-www-form-urlencoded body, which is what
+    the /admin page posts and which is answered with a 302 redirect back to
+    /admin. Returns 400 when name or target is missing, when type is not one of
+    http, tcp, ssl, when interval is below 5 seconds, or when retries is below 1.
+    A JSON body or an Accept: application/json header gets a JSON response;
+    anything else is treated as a browser and redirected to /admin.
+servers:
+  - url: http://127.0.0.1:8000
+paths:
+  /:
+    get:
+      summary: public status page (HTML)
+      responses:
+        "200":
+          description: status.html rendered from the monitors table
+  /admin:
+    get:
+      summary: admin page (HTML) - add monitors, resolve incidents
+      responses:
+        "200":
+          description: admin.html rendered from the monitors and incidents tables
+  /api/status:
+    get:
+      summary: public status as JSON
+      responses:
+        "200":
+          description: '{"overall": "operational"|"degraded", "services": [{name, status, uptime_30d, last_ms}]}'
+  /api/admin/monitors:
+    post:
+      summary: add monitor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, target]
+              properties:
+                name: {type: string}
+                type: {type: string, enum: [http, tcp, ssl], default: http}
+                target: {type: string}
+                interval: {type: integer, default: 60}
+                retries: {type: integer, default: 2}
+      responses:
+        "200":
+          description: '{"id": 1}'
+        "400":
+          description: >
+            name or target missing, type not in http/tcp/ssl, interval < 5, or
+            retries < 1 - body {"error": "..."}
+  /api/admin/monitors/<int:mid>/checks:
+    get:
+      summary: last 100 checks for a monitor
+      responses:
+        "200":
+          description: '{"checks": [{ok, ms, at}]}'
+  /api/admin/incidents/<int:iid>/resolve:
+    post:
+      summary: resolve an incident
+      responses:
+        "200":
+          description: '{"status": "resolved"}'
+        "404":
+          description: no incident with that id
