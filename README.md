@@ -1,4 +1,4 @@
-# statuspage
+# uptimescope
 
 > A self-hosted uptime monitor with a public status page. A background poller probes
 
@@ -6,8 +6,8 @@
 [![python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-b2_statuspage is a Flask service delivered as an installable, typed, test-covered
-distribution. The business logic is unchanged from the original skeleton; what
+uptimescope is a Flask service delivered as an installable, typed, test-covered
+distribution. The business logic is unchanged from the original service; what
 is new is the engineering around it: a packaging story, a configuration
 contract, structured observability, operational endpoints, a hardened
 container, and the gates that keep all of that true.
@@ -17,7 +17,7 @@ container, and the gates that keep all of that true.
 ## Quickstart
 
 ```sh
-git clone <your-fork> b2_statuspage && cd b2_statuspage
+git clone <your-fork> uptimescope && cd uptimescope
 python -m venv .venv
 . .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
@@ -132,7 +132,7 @@ variable, rather than surfacing as a confusing runtime error later.
 | `/api/status` | GET | JSON |
 | `/api/status` | T | JSON |
 
-The frozen machine-readable contract is `openapi/b2_statuspage.yaml`; it is the
+The frozen machine-readable contract is `openapi/uptimescope.yaml`; it is the
 source of truth for path and method coverage.
 
 ---
@@ -150,9 +150,9 @@ source of truth for path and method coverage.
 │   ├── ARCHITECTURE.md
 │   └── OPERATIONS.md
 ├── openapi
-│   └── b2_statuspage.yaml
+│   └── uptimescope.yaml
 ├── schema
-│   └── b2_statuspage.sql
+│   └── uptimescope.sql
 ├── src
 │   └── statuspage
 │       ├── monitor
@@ -170,7 +170,7 @@ source of truth for path and method coverage.
 │       └── py.typed
 ├── tests
 │   ├── conftest.py
-│   ├── test_b2_statuspage.py
+│   ├── test_uptimescope.py
 │   ├── test_config.py
 │   └── test_ops.py
 ├── .dockerignore

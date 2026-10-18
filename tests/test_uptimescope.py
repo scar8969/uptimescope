@@ -1,4 +1,4 @@
-"""B2 statuspage — tests. Run: pytest test_b2_statuspage.py"""
+"""B2 statuspage — tests. Run: pytest test_uptimescope.py"""
 import sys, os, threading
 
 import pytest

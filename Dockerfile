@@ -34,7 +34,7 @@ RUN groupadd --system --gid 1001 app \
 WORKDIR /app
 
 COPY --from=builder /wheels /wheels
-RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels b2-statuspage \
+RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels uptimescope \
  && rm -rf /wheels \
  && mkdir -p /var/lib/statuspage/instance /var/lib/statuspage/log \
  && chown -R app:app /var/lib/statuspage /app

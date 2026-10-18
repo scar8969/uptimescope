@@ -9,7 +9,7 @@ they do, and what breaks first under load.
 
 ## 1. Context
 
-b2_statuspage is a single-process Flask service. It owns its own database (SQLite by
+uptimescope is a single-process Flask service. It owns its own database (SQLite by
 default, any SQLAlchemy-supported backend via `DATABASE_URL`) and is deployed
 behind a reverse proxy or an orchestrator.
 
@@ -74,7 +74,7 @@ flowchart TB
 | `templates/admin.html` | asset |
 | `templates/base.html` | asset |
 | `templates/status.html` | asset |
-| `tests/test_b2_statuspage.py` | module |
+| `tests/test_uptimescope.py` | module |
 | `_app.py` | asset |
 
 ---
@@ -137,9 +137,9 @@ writable lives under `/app`.
 
 | Table | Owner |
 | --- | --- |
-| `monitors` | owned by `b2_statuspage` |
-| `checks` | owned by `b2_statuspage` |
-| `incidents` | owned by `b2_statuspage` |
+| `monitors` | owned by `uptimescope` |
+| `checks` | owned by `uptimescope` |
+| `incidents` | owned by `uptimescope` |
 
 Tables are created by the application's own bootstrap on first use. No migration
 tool is wired in; the schema is additive, and the service tolerates a missing or

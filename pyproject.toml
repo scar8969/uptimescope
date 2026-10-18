@@ -3,13 +3,13 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "b2-statuspage"
+name = "uptimescope"
 version = "0.1.0"
-description = "A self-hosted uptime monitor with a public status page. A background poller probes"
+description = "Self-hosted uptime monitor with a public status page: background probes, incidents and per-monitor history."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "project-skeletons maintainers" }]
+authors = [{ name = "Priyanshu Rout" }]
 keywords = ["flask", "service", "statuspage"]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -46,7 +46,7 @@ Documentation = "https://example.invalid/statuspage/docs"
 Issues = "https://example.invalid/statuspage/issues"
 
 [project.scripts]
-b2-statuspage = "statuspage.cli:main"
+uptimescope = "statuspage.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
