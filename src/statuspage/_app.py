@@ -1,11 +1,11 @@
 """Flask application: the public status page plus the JSON API.
 
 The app object is built here rather than in the tree root so `wsgi.py` can find
-it as `web.app`.  Two things in the constructor matter:
+it as `<pkg>.app`.  Two things in the constructor matter:
 
-* `template_folder` points at the tree's own `templates/` directory.  A bare
-  `Flask(__name__)` would resolve templates relative to this package
-  (`web/templates/`), which is not where the pages live.
+* `template_folder` points at the package's own `templates/` directory.  A
+  bare `Flask(__name__)` would resolve templates relative to the caller, which
+  is not where the pages live.
 * `instance_path` points at the tree's `instance/` directory, so the SQLite
   file lands next to the code and survives a `git clean`-free restart.
 
@@ -15,6 +15,7 @@ Nothing is seeded at import time: an empty database renders an honest
 
 import atexit
 import os
+from typing import Any
 
 from flask import Flask, render_template
 
@@ -25,6 +26,10 @@ from .monitor.incidents import uptime_pct
 from .monitor.scheduler import Scheduler
 
 paths.ensure_runtime_dirs()
+
+
+# Started once per process by start_scheduler().
+_scheduler: Any = None
 
 
 def build_app():
@@ -102,8 +107,6 @@ def build_app():
             open_incident_count=Incident.query.filter_by(resolved_at=None).count(),
             check_counts={m.id: Check.query.filter_by(monitor_id=m.id).count() for m in monitors},
         )
-
-    _scheduler = None
 
     def start_scheduler(interval=None):
         """Start the background poller once, and stop it when the process exits."""

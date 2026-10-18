@@ -27,10 +27,10 @@ def check_ssl(host, port=443, timeout=5.0):
         ctx = ssl.create_default_context()
         with socket.create_connection((host, port), timeout) as sock:
             with ctx.wrap_socket(sock, server_hostname=host) as tls:
-                cert = tls.getpeercert()
+                cert = tls.getpeercert() or {}
                 from datetime import datetime
 
-                not_after = datetime.strptime(cert["notAfter"], "%b %d %H:%M:%S %Y %Z")
+                not_after = datetime.strptime(str(cert["notAfter"]), "%b %d %H:%M:%S %Y %Z")
                 days = (not_after - datetime.utcnow()).days
                 return days > 0, days
     except Exception:
