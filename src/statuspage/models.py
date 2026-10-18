@@ -1,7 +1,9 @@
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
 
 class Monitor(db.Model):
     __tablename__ = "monitors"
@@ -14,6 +16,7 @@ class Monitor(db.Model):
     active = db.Column(db.Integer, default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
 class Check(db.Model):
     __tablename__ = "checks"
     id = db.Column(db.Integer, primary_key=True)
@@ -22,6 +25,7 @@ class Check(db.Model):
     ms = db.Column(db.Integer, default=0)
     detail = db.Column(db.String(256), default="")
     at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class Incident(db.Model):
     __tablename__ = "incidents"

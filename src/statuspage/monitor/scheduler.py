@@ -6,9 +6,10 @@ result to `monitor.incidents.detect` for incident open/close.  A pass that raise
 is logged once and retried on the next tick, so one unreachable target can never
 kill the thread.
 """
+
 import sys
 import threading
-import time
+
 
 class Scheduler:
     """Background poller.  `app` may be a Flask app; each tick then runs inside
@@ -26,8 +27,7 @@ class Scheduler:
         if self._thread is not None and self._thread.is_alive():
             return self._thread
         self._stop.clear()
-        self._thread = threading.Thread(target=self._loop, name="monitor-scheduler",
-                                        daemon=True)
+        self._thread = threading.Thread(target=self._loop, name="monitor-scheduler", daemon=True)
         self._thread.start()
         return self._thread
 
@@ -84,7 +84,7 @@ class Scheduler:
         while not self._stop.is_set():
             try:
                 self._run_tick()
-            except Exception as exc:  # noqa: BLE001 - a tick must never kill the thread
+            except Exception as exc:
                 if not self._warned:
                     self._warned = True
                     print("[scheduler] tick failed: %r" % (exc,), file=sys.stderr)

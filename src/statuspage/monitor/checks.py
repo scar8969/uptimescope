@@ -1,4 +1,8 @@
-import socket, ssl, time, urllib.request
+import socket
+import ssl
+import time
+import urllib.request
+
 
 def check_http(url, timeout=10.0):
     s = time.perf_counter()
@@ -8,6 +12,7 @@ def check_http(url, timeout=10.0):
     except Exception:
         return False, (time.perf_counter() - s) * 1000
 
+
 def check_tcp(host, port, timeout=5.0):
     s = time.perf_counter()
     try:
@@ -16,6 +21,7 @@ def check_tcp(host, port, timeout=5.0):
     except Exception:
         return False, (time.perf_counter() - s) * 1000
 
+
 def check_ssl(host, port=443, timeout=5.0):
     try:
         ctx = ssl.create_default_context()
@@ -23,6 +29,7 @@ def check_ssl(host, port=443, timeout=5.0):
             with ctx.wrap_socket(sock, server_hostname=host) as tls:
                 cert = tls.getpeercert()
                 from datetime import datetime
+
                 not_after = datetime.strptime(cert["notAfter"], "%b %d %H:%M:%S %Y %Z")
                 days = (not_after - datetime.utcnow()).days
                 return days > 0, days

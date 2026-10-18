@@ -12,24 +12,26 @@ it as `web.app`.  Two things in the constructor matter:
 Nothing is seeded at import time: an empty database renders an honest
 "no monitors yet" page instead of inventing rows.
 """
+
 import atexit
 import os
 
 from flask import Flask, render_template
 
+from . import paths
 from .models import Check, Incident, Monitor, db
 from .monitor.api import bp
 from .monitor.incidents import uptime_pct
 from .monitor.scheduler import Scheduler
-from . import paths
 
 paths.ensure_runtime_dirs()
 
+
 def build_app():
     """Build the application: configuration, database, then routes."""
-    app = Flask(__name__,
-                template_folder=str(paths.TEMPLATES_DIR),
-                instance_path=str(paths.INSTANCE_DIR))
+    app = Flask(
+        __name__, template_folder=str(paths.TEMPLATES_DIR), instance_path=str(paths.INSTANCE_DIR)
+    )
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + str(paths.INSTANCE_DIR / "statuspage.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)
@@ -45,8 +47,12 @@ def build_app():
 
     def latest_checks(monitor_id, limit=30):
         """Most recent checks for a monitor, oldest first, for the uptime strip."""
-        rows = (Check.query.filter_by(monitor_id=monitor_id)
-                .order_by(Check.id.desc()).limit(limit).all())
+        rows = (
+            Check.query.filter_by(monitor_id=monitor_id)
+            .order_by(Check.id.desc())
+            .limit(limit)
+            .all()
+        )
         return list(reversed(rows))
 
     def _stats(monitors, open_incidents):
@@ -55,14 +61,20 @@ def build_app():
             if any(i.monitor_id == m.id for i in open_incidents):
                 continue
             up += 1
-        return {"monitors": len(monitors), "up": up,
-                "down": len(monitors) - up, "incidents": len(open_incidents)}
+        return {
+            "monitors": len(monitors),
+            "up": up,
+            "down": len(monitors) - up,
+            "incidents": len(open_incidents),
+        }
 
     @app.get("/")
     def index():
         """Public status page: every active monitor, its uptime and recent checks."""
         monitors = Monitor.query.filter_by(active=1).order_by(Monitor.name).all()
-        open_incidents = Incident.query.filter_by(resolved_at=None).order_by(Incident.started_at.desc()).all()
+        open_incidents = (
+            Incident.query.filter_by(resolved_at=None).order_by(Incident.started_at.desc()).all()
+        )
         monitor_names = {m.id: m.name for m in monitors}
         return render_template(
             "status.html",
@@ -98,7 +110,9 @@ def build_app():
         global _scheduler
         if _scheduler is not None:
             return _scheduler
-        _scheduler = Scheduler(app=app, interval=float(interval or os.environ.get("CHECK_INTERVAL", "30")))
+        _scheduler = Scheduler(
+            app=app, interval=float(interval or os.environ.get("CHECK_INTERVAL", "30"))
+        )
         _scheduler.start()
         atexit.register(_scheduler.stop)
         return _scheduler
@@ -110,5 +124,6 @@ def build_app():
             print("[app] scheduler not started: %r" % (exc,))
 
     return app
+
 
 app = build_app()
