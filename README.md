@@ -141,7 +141,7 @@ Produced on this checkout by `pytest --cov` and by booting `wsgi.py` and issuing
 | --- | --- |
 | Tests | **25 / 25 passed** (3.8 s, exit 0) |
 | Line coverage | **60.0%** — 486 of 761 statements |
-| Source | 16 files / 1,646 lines |
+| Source | 16 files / 1,669 lines |
 | Test code | 4 files / 264 lines |
 | Documented paths | 6 in the spec, 4 GET |
 | Live probe | 9 GET requests to the booted app, **8 answered 200** |
@@ -179,12 +179,12 @@ uptimescope/
 │   ├── observability.py                169  Structured logging and request correlation for statu
 │   ├── _app.py                         133  Flask application: the public status page plus the J
 │   ├── app.py                          119  Application factory for statuspage
-│   ├── monitor/api.py                  110  JSON API for the status page and the admin UI
+│   ├── monitor/api.py                  109  JSON API for the status page and the admin UI
 │   ├── errors.py                       108  Typed application errors and their HTTP mapping for 
-│   ├── monitor/scheduler.py             92  Polling scheduler: every `interval` seconds, check e
+│   ├── monitor/scheduler.py             94  Polling scheduler: every `interval` seconds, check e
 │   ├── paths.py                         52  Filesystem layout for statuspage
-│   ├── monitor/incidents.py             47  Incident detection and uptime maths
-│   ├── models.py                        38  
+│   ├── monitor/incidents.py             49  
+│   ├── monitor/checks.py                40  
 ├── openapi/uptimescope.yaml               the contract of record
 ├── schema/uptimescope.sql                 the DDL
 ├── tests/                       the suite that has to stay green

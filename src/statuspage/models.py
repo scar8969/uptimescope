@@ -1,6 +1,6 @@
-from datetime import datetime
-
 from flask_sqlalchemy import SQLAlchemy
+
+from .clock import utcnow
 
 db = SQLAlchemy()
 
@@ -14,7 +14,7 @@ class Monitor(db.Model):
     interval = db.Column(db.Integer, default=60)
     retries = db.Column(db.Integer, default=2)
     active = db.Column(db.Integer, default=1)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utcnow)
 
 
 class Check(db.Model):
@@ -24,14 +24,14 @@ class Check(db.Model):
     ok = db.Column(db.Integer, default=1)
     ms = db.Column(db.Integer, default=0)
     detail = db.Column(db.String(256), default="")
-    at = db.Column(db.DateTime, default=datetime.utcnow)
+    at = db.Column(db.DateTime, default=utcnow)
 
 
 class Incident(db.Model):
     __tablename__ = "incidents"
     id = db.Column(db.Integer, primary_key=True)
     monitor_id = db.Column(db.Integer, db.ForeignKey("monitors.id"))
-    started_at = db.Column(db.DateTime, default=datetime.utcnow)
+    started_at = db.Column(db.DateTime, default=utcnow)
     resolved_at = db.Column(db.DateTime, nullable=True)
     severity = db.Column(db.String(16), default="down")  # degraded|down
     message = db.Column(db.String(256), default="")

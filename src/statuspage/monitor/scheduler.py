@@ -10,6 +10,8 @@ kill the thread.
 import sys
 import threading
 
+from ..clock import utcnow
+
 
 class Scheduler:
     """Background poller.  `app` may be a Flask app; each tick then runs inside
@@ -50,7 +52,7 @@ class Scheduler:
         for m in Monitor.query.filter_by(active=1).all():
             last = Check.query.filter_by(monitor_id=m.id).order_by(Check.id.desc()).first()
             due_after = timedelta(seconds=m.interval or 60)
-            if last is not None and last.at and datetime.utcnow() - last.at < due_after:
+            if last is not None and last.at and utcnow() - last.at < due_after:
                 continue
             ok, value = self._probe(m, check_http, check_tcp, check_ssl)
             db.session.add(Check(monitor_id=m.id, ok=1 if ok else 0, ms=int(value)))

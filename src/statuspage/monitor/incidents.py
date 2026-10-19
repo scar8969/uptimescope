@@ -1,3 +1,7 @@
+from datetime import timedelta
+
+from ..clock import utcnow
+
 """Incident detection and uptime maths.
 
 The project root is on sys.path at runtime (wsgi.py inserts it, and the app is
@@ -5,8 +9,6 @@ started from this directory), so the application modules are imported flat:
 `from models import ...`, not `from .models import ...` - the latter would look
 for the non-existent package `monitor.models`.
 """
-
-from datetime import datetime, timedelta
 
 
 def detect(monitor, ok):
@@ -31,7 +33,7 @@ def detect(monitor, ok):
             )
             db.session.commit()
     elif ok and open_inc:
-        open_inc.resolved_at = datetime.utcnow()
+        open_inc.resolved_at = utcnow()
         db.session.commit()
 
 
@@ -39,7 +41,7 @@ def uptime_pct(monitor_id, days=30):
     """Share of successful checks over the window, or 100.0 when there is no data."""
     from ..models import Check
 
-    since = datetime.utcnow() - timedelta(days=days)
+    since = utcnow() - timedelta(days=days)
     checks = Check.query.filter(Check.monitor_id == monitor_id, Check.at >= since).all()
     if not checks:
         return 100.0

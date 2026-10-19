@@ -3,6 +3,8 @@ import ssl
 import time
 import urllib.request
 
+from ..clock import utcnow
+
 
 def check_http(url, timeout=10.0):
     s = time.perf_counter()
@@ -31,7 +33,7 @@ def check_ssl(host, port=443, timeout=5.0):
                 from datetime import datetime
 
                 not_after = datetime.strptime(str(cert["notAfter"]), "%b %d %H:%M:%S %Y %Z")
-                days = (not_after - datetime.utcnow()).days
+                days = (not_after - utcnow()).days
                 return days > 0, days
     except Exception:
         return False, 0

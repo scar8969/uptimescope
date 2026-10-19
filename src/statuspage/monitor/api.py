@@ -6,10 +6,9 @@ so the shipped forms work without any JavaScript.  Validation failures are 400s
 with an {"error": ...} body - the write endpoints never silently repair input.
 """
 
-import datetime
-
 from flask import Blueprint, jsonify, redirect, request, url_for
 
+from ..clock import utcnow
 from ..models import Check, Incident, Monitor, db
 from .incidents import uptime_pct
 
@@ -102,7 +101,7 @@ def checks(mid):
 @bp.post("/api/admin/incidents/<int:iid>/resolve")
 def resolve(iid):
     inc = Incident.query.get_or_404(iid)
-    inc.resolved_at = datetime.datetime.utcnow()
+    inc.resolved_at = utcnow()
     db.session.commit()
     if _browser():
         return redirect(url_for("admin"))
