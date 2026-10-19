@@ -4,7 +4,7 @@ Every line below was produced by a command run against this exact checkout, on t
 
 | | |
 | --- | --- |
-| Generated | 2026-10-19 02:23 |
+| Generated | 2026-10-19 09:41 |
 | Python | 3.14.7 |
 | Platform | Windows 11 |
 
@@ -15,7 +15,7 @@ python -m pytest -q
 ```
 
 - exit code **0**
-- 25 passed, 1 warning in 3.37s
+- 25 passed, 1 warning in 3.31s
 
 ## Static gates
 
@@ -38,6 +38,25 @@ The application was imported through `wsgi.py` and each GET path declared in `op
 | 200 | `/api/admin/monitors/1/checks` | 14 | application/json |
 
 4 paths walked, 0 of them raised or answered 5xx.
+
+## CLI
+
+```
+usage: statuspage [-h] {status,add,checks,resolve,monitors} ...
+
+Query and administer a running statuspage instance.
+
+positional arguments:
+  {status,add,checks,resolve,monitors}
+    status              public status: every monitor and its uptime
+    add                 register a monitor
+    checks              last 100 checks for a monitor
+    resolve             mark an incident resolved
+    monitors            list monitors from the local database
+
+options:
+  -h, --help            show this help message and exit
+```
 
 ## Screenshots
 
